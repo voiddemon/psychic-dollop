@@ -1,34 +1,39 @@
-import React from "react";
-import logo from "../images/logo.svg";
-import "./App.css";
+import React, { useState, useEffect } from "react";
+import axios from "../../axios";
+import Child from "../Child/Child";
 
-function App() {
+const App = () => {
+  const [respObj, setRespObj] = useState({});
+
+  useEffect(() => {
+    const getParams = new URLSearchParams(window.location.search);
+    const isHd = getParams.get("isHd");
+    const date = getParams.get("date");
+
+    axios
+      .get(
+        `http://localhost:8080/astronomy/apod/day/?ishd=${isHd}&date=${date}`
+      )
+      .then((res) => {
+        let respObj = {};
+        console.log("Get Response ---------->> ", res);
+        respObj = res.data;
+        setRespObj(respObj);
+        console.log(respObj);
+      })
+      .catch((err) => {
+        console.log("Error occured------>> " + err);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <div>
-          <img src={logo} className="App-logo" alt="logo" />
-        </div>
-        <div>
-          <h1>
-            {/* Edit <code>src/App.js</code> and save to reload. */}
-            HERE
-          </h1>
-        </div>
-        <div>
-          <img src={logo} className="App-logo" alt="logo" />
-        </div>
-        {/* <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a> */}
-      </header>
-    </div>
+    respObj && (
+      <div id="app">
+        {respObj && <h2>{respObj.title}</h2>}
+        {respObj && <Child respObj={respObj} />}
+      </div>
+    )
   );
-}
+};
 
 export default App;
